@@ -40,6 +40,19 @@ app.get('/api/persons', (req, res) => {
   // })
 })
 
+app.post('/api/persons', (req, res) => {
+  const body = req.body
+
+  const person = {
+    name: body.name,
+    number: body.number,
+    id: Math.floor(Math.random() * 999999999 + 1)
+  }
+
+  persons = persons.concat(person)
+  res.json(person)
+})
+
 app.get('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id)
   const person = persons.find(person => person.id === id)
