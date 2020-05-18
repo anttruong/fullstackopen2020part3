@@ -41,16 +41,25 @@ app.get('/api/persons', (req, res) => {
 })
 
 app.post('/api/persons', (req, res) => {
-  const body = req.body
+  const name = req.body.name
+  const number = req.body.number
 
-  const person = {
-    name: body.name,
-    number: body.number,
-    id: Math.floor(Math.random() * 999999999 + 1)
+  if (!name) {
+    res.sendStatus(400).send({ error: 'name is required' })
+  } else if (!number) {
+    res.sendStatus(400).send({ error: 'number is required' })
+  } else if (persons.find(person => person.name === name)) {
+    res.sendStatus(400).send({ error: 'name must be unique' })
+  } else {
+    const person = {
+      name: name,
+      number: number,
+      id: Math.floor(Math.random() * 999999999 + 1)
+    }
+
+    persons = persons.concat(person)
+    res.json(person)
   }
-
-  persons = persons.concat(person)
-  res.json(person)
 })
 
 app.get('/api/persons/:id', (req, res) => {
