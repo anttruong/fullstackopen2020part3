@@ -16,7 +16,6 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
 const personSchema = new mongoose.Schema({
     name: String,
     number: String,
-    date: Date,
 })
 
 const Person = mongoose.model('Person', personSchema)
@@ -25,7 +24,6 @@ if (process.argv.length === 5) {
     const person = new Person({
         name: `${name}`,
         number: `${number}`,
-        date: new Date(),
     })
     person.save().then(result => {
         console.log(`added ${name} number ${number} to phonebook`)
