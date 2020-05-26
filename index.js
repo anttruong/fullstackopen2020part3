@@ -44,7 +44,7 @@ app.get('/api/persons', (req, res, next) => {
 })
 
 app.post('/api/persons', (req, res, next) => {
-  const body = req.body
+  // const body = req.body
 
   // if (!req.body) {
   //   res.sendStatus(400).send({ error: 'content is required' })
@@ -61,7 +61,7 @@ app.post('/api/persons', (req, res, next) => {
 
   person.save().then(savedPerson => res.json(savedPerson))
     .catch(error => next(error))
-      // res.json(person)
+  // res.json(person)
 })
 
 app.get('/api/persons/:id', (req, res, next) => {
@@ -95,15 +95,19 @@ app.delete('/api/persons/:id', (req, res, next) => {
   //   res.sendStatus(404).end()
   // }
 
-  Person.findByIdAndRemove(req.params.id).then(result => {
+  Person.findByIdAndRemove(req.params.id).then(() => {
     res.status(204).end()
-  })
-    .catch(error => next(error))
+  }).catch(error => next(error))
 })
 
-app.get('/info', (req, res) => {
-  res.send(`<div>Phonebook has info for ${People.length} people</div>
+app.get('/info', (req, res, next) => {
+  // res.send(`<div>Phonebook has info for ${Person.countDocuments({})} people</div>
+  // <div></br>${new Date}</div>`)
+
+  Person.countDocuments({}).then(result => {
+    res.send(`<div>Phonebook has info for ${result} people</div>
   <div></br>${new Date}</div>`)
+  }).catch(error => next(error))
 })
 
 const unknownEnpoint = (req, res) => {
