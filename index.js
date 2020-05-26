@@ -40,7 +40,7 @@ app.get('/api/persons', (req, res, next) => {
   // res.json(persons)
   Person.find({}).then(person => {
     res.json(person)
-  }).catch(error => next(error()))
+  }).catch(error => next(error))
 })
 
 app.post('/api/persons', (req, res, next) => {
@@ -60,9 +60,8 @@ app.post('/api/persons', (req, res, next) => {
   })
 
   person.save().then(savedPerson => res.json(savedPerson))
-    .catch(error => next(error())
+    .catch(error => next(error))
       // res.json(person)
-    )
 })
 
 app.get('/api/persons/:id', (req, res, next) => {
