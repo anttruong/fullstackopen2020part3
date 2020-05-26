@@ -36,42 +36,56 @@ app.get('/', (req, res) => {
   res.send('<h1>Hello World!</h1>')
 })
 
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', (req, res, next) => {
   // res.json(persons)
   Person.find({}).then(person => {
     res.json(person)
-  })
+  }).catch(error => next(error()))
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   const body = req.body
 
-  if (!req.body) {
-    res.sendStatus(400).send({ error: 'content is required' })
-  } else {
-    const person = new Person({
-      name: req.body.name,
-      number: req.body.number
-    })
+  // if (!req.body) {
+  //   res.sendStatus(400).send({ error: 'content is required' })
+  // } else {
+  //   const person = new Person({
+  //     name: req.body.name,
+  //     number: req.body.number
+  //   })
 
-    person.save().then(savedPerson => res.json(savedPerson))
-    // res.json(person)
-  }
+  const person = new Person({
+    name: req.body.name,
+    number: req.body.number
+  })
+
+  person.save().then(savedPerson => res.json(savedPerson))
+    .catch(error => next(error())
+      // res.json(person)
+    )
 })
 
-app.get('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id)
-  const person = Person.find(person => person.id === id)
+app.get('/api/persons/:id', (req, res, next) => {
+  // const id = Number(req.params.id)
+  // const person = Person.find(person => person.id === id)
 
-  if (person) {
-    res.json(person)
+  // if (person) {
+  //   res.json(person)
 
-  } else {
-    res.sendStatus(404).end()
-  }
+  // } else {
+  //   res.sendStatus(404).end()
+  // }
+
+  Person.findById(req.params.id).then(person => {
+    if (person) {
+      res.json(person)
+    } else {
+      res.status(404).end()
+    }
+  }).catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res, next) => {
   // const id = Number(req.params.id)
   // const person = People.find(person => person.id === id)
 
@@ -85,16 +99,31 @@ app.delete('/api/persons/:id', (req, res) => {
   Person.findByIdAndRemove(req.params.id).then(result => {
     res.status(204).end()
   })
-    .catch(error => {
-      console.log(error)
-      Response.status(400).send({ error: 'asdf' })
-    })
+    .catch(error => next(error))
 })
 
 app.get('/info', (req, res) => {
   res.send(`<div>Phonebook has info for ${People.length} people</div>
   <div></br>${new Date}</div>`)
 })
+
+const unknownEnpoint = (req, res) => {
+  res.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEnpoint)
+
+const errorHandler = (error, req, res, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id' })
+  }
+
+  next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
